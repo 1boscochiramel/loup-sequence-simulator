@@ -33,6 +33,7 @@ python -m http.server 8081
 # http://localhost:8081
 ```
 
-## Deploy (GitHub Pages)
-Push and enable Pages (Settings → Pages → Source: GitHub Actions). The workflow in
-`.github/workflows/deploy-pages.yml` publishes this folder on every push to `main`.
+## Deploy (live URL)
+Static site, no build. Enable **Settings → Pages → Source: Deploy from a branch → `main` / root**.
+Note: GitHub Pages on a **private** repo needs a paid plan (Pro/Team); on a **public** repo it is free.
+Alternatively deploy from this repo to Netlify / Vercel / Cloudflare Pages for a free public URL.
