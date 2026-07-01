@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LOUP Sequence Autopilot — ISA-106 procedural automation (live)</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.wrap2{max-width:1200px;margin:0 auto;padding:14px}
+.ctrlbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);
+  border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.ctrlbar .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.ctrlbar .seg button{background:var(--panel2);color:var(--mut);border:0;padding:8px 14px;font-weight:800;cursor:pointer;font-size:13px}
+.ctrlbar .seg button.on{background:var(--accentd);color:#fff}
+.bigbtn{background:var(--okd);color:#fff;border:1px solid var(--ok);border-radius:9px;padding:10px 18px;font-weight:900;cursor:pointer;font-size:14px}
+.bigbtn:hover{filter:brightness(1.12)}
+.bigbtn.stop{background:var(--critd);border-color:var(--crit)}
+.bigbtn.ghost{background:transparent;color:var(--mut);border-color:var(--line)}
+.chip{font-weight:800;font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line)}
+.chip.run{background:#13301f;color:#5fe08f;border-color:#2f6a3f}
+.chip.hold{background:#3a1d1d;color:#ff9b9b;border-color:var(--crit);animation:pulse 1s infinite}
+.chip.wait{background:#332a13;color:#f4c95f;border-color:#6a561a}
+.chip.done{background:#13203a;color:#8fbfff;border-color:#27568f}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+
+.layout2{display:grid;grid-template-columns:1fr 340px;gap:14px}
+@media(max-width:900px){.layout2{grid-template-columns:1fr}}
+
+/* controller progress rail */
+.rail{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.rail .r{flex:1;min-width:120px;background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
+.rail .r.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.rail .r.done{border-color:var(--okd)}
+.rail .r .t{font-size:11px;color:var(--mut);font-weight:700}
+.rail .r .n{font-size:11px;color:var(--dim)}
+.rail .r .bar{height:4px;background:#0b1020;border-radius:2px;margin-top:5px;overflow:hidden}
+.rail .r .bar i{display:block;height:100%;background:var(--ok);width:0}
+
+/* step list */
+.steps{display:flex;flex-direction:column;gap:6px;max-height:62vh;overflow:auto;padding-right:4px}
+.st{display:grid;grid-template-columns:34px 1fr 92px;gap:8px;align-items:start;background:var(--card);
+  border:1px solid var(--line);border-left-width:4px;border-radius:9px;padding:8px 10px;font-size:13px}
+.st.pending{opacity:.5}
+.st.active{border-left-color:var(--accent);background:var(--panel2);box-shadow:0 0 0 1px var(--accent) inset}
+.st.done{border-left-color:var(--okd)}
+.st.holdstep{border-left-color:var(--crit)}
+.st .no{font-weight:800;color:var(--dim);font-variant-numeric:tabular-nums}
+.st .tx{color:var(--ink)}
+.st .grp{font-size:10px;color:var(--accent);font-weight:800;letter-spacing:.3px}
+.st .meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.st .by{font-size:10px;color:var(--mut);font-weight:700}
+.st .ty{font-size:9px;font-weight:800;padding:1px 6px;border-radius:5px;text-transform:uppercase}
+.ty.check{background:#13203a;color:#8fbfff}
+.ty.field{background:#2a2233;color:#d6a8f0}
+.ty.signoff{background:#332a13;color:#f4c95f}
+.ty.ramp{background:#13301f;color:#7fe0a0}
+.ty.hold{background:#3a1d1d;color:#ff9b9b}
+.ty.branch{background:#241a3a;color:#b79bff}
+.st .prog{grid-column:2/4;height:5px;background:#0b1020;border-radius:3px;overflow:hidden;margin-top:5px;display:none}
+.st.active .prog{display:block}
+.st .prog i{display:block;height:100%;background:var(--ok);width:0;transition:width .2s}
+.st .live{grid-column:2/4;font-size:11px;color:var(--warn);margin-top:3px;font-family:ui-monospace,Consolas,monospace}
+.st .gate{grid-column:2/4;margin-top:7px;display:flex;gap:7px}
+.st .gate button{border-radius:7px;padding:7px 12px;font-weight:800;cursor:pointer;font-size:12px;border:1px solid}
+.st .gate .ok{background:var(--okd);color:#fff;border-color:var(--ok)}
+.st .gate .field{background:#3a2a4a;color:#e6ccff;border-color:#6a4080}
+
+/* side: telemetry + audit */
+.side .card{margin-bottom:12px}
+.tele{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tele .t{background:#0b1020;border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+.tele .t .k{font-size:10px;color:var(--dim);font-weight:700}
+.tele .t .v{font-size:16px;font-weight:800;color:#bcd4ff;font-variant-numeric:tabular-nums}
+.tele .t .u{font-size:10px;color:var(--dim)}
+.audit{background:#0b1020;border:1px solid var(--line);border-radius:10px;padding:6px 0;max-height:300px;overflow:auto;
+  font-family:ui-monospace,Consolas,monospace;font-size:11px}
+.audit .row{padding:4px 11px;border-bottom:1px solid #131b2e;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.audit .ts{color:var(--dim)}
+.audit .ok{color:var(--ok)}.audit .hold{color:var(--crit)}.audit .sys{color:var(--accent)}.audit .field{color:#d6a8f0}
+
+/* table view (scan-like, printable) */
+#tableView{display:none}
+table.seq{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff;color:#111}
+table.seq th,table.seq td{border:1px solid #999;padding:5px 8px;vertical-align:top}
+table.seq th{background:#e8e8e8;font-weight:800}
+table.seq .ctrl{background:#d7e3f4;font-weight:800;text-align:center}
+table.seq .grp{background:#f0f0f0;font-weight:700;text-align:center}
+table.seq td.no{width:40px;text-align:center}
+table.seq td.by{width:110px}
+table.seq td.rm{width:120px}
+.printbtn{margin:10px 0}
+.note{background:#15263f;border:1px solid #27568f;border-radius:10px;padding:10px 13px;color:#cfe1ff;font-size:12.5px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>LOUP Sequence Autopilot <small>ISA-106 procedural automation</small></div>
+  <div class="spacer"></div>
+  <span class="dim" style="font-size:12px">Start-up &amp; SOP emergency procedures</span>
+</div>
+
+<div class="wrap2">
+  <div class="note" style="border-color:#a8741a;background:#2a2113;color:#ffdca8">🔒 <b>Confidentiality:</b> all values shown (pressures, temperatures, flows, setpoints, trip thresholds) are <b>RANDOMISED &amp; illustrative — NOT actual plant data</b>. Runs on a synthetic twin; no connection to any live DCS.</div>
+  <div class="note">🏭 <b>ISA-106 procedural automation</b> for the <b id="unitName">LOUP unit</b> — <b>Start-up</b> auto-sequence + the <b>SOP emergency procedures</b>
+  (hydrogen, amine, RGC, instrument-air, cooling-water, pump failures, reactor runaway). Press <b>Start Sequence</b> and it runs step-by-step —
+  ramping temperatures/pressures, pausing for field/DCS sign-off, taking HOLD/ESD branches. Every action is logged.
+  <span class="pill synth">Synthetic twin of the real procedures</span>
+  <div id="scenNote" style="margin-top:8px;color:#ffd9a8"></div></div>
+
+  <div class="ctrlbar">
+    <div class="seg" id="modeSeg">
+      <button data-m="startup" class="on">▶ Start-up</button>
+      <button data-m="emergency">🚨 Emergency</button>
+    </div>
+    <label id="emWrap" class="dim" style="font-size:12px;display:none">Scenario
+      <select id="emSelect" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:6px;font-weight:700;max-width:320px"></select>
+    </label>
+    <div class="seg" id="viewSeg">
+      <button data-v="live" class="on">Live run</button>
+      <button data-v="table">Sequence table</button>
+    </div>
+    <span class="spacer" style="flex:1"></span>
+    <span class="chip wait" id="stateChip">READY</span>
+    <label class="dim" style="font-size:12px">Speed
+      <select id="speed" style="background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:6px">
+        <option value="1">1× (compressed)</option>
+        <option value="3" selected>3×</option>
+        <option value="8">8×</option>
+      </select>
+    </label>
+    <button class="bigbtn" id="startBtn">▶ Start Sequence</button>
+    <button class="bigbtn ghost" id="resetBtn">↺ Reset</button>
+  </div>
+
+  <!-- LIVE VIEW -->
+  <div id="liveView">
+    <div class="rail" id="rail"></div>
+    <div class="layout2">
+      <div>
+        <div class="steps" id="steps"></div>
+      </div>
+      <div class="side">
+        <div class="card">
+          <h3 class="sec" style="margin-top:0;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--dim)">Live telemetry <span class="pill calc">CALC</span></h3>
+          <div class="tele" id="tele"></div>
+        </div>
+        <div class="card">
+          <h3 class="sec" style="margin-top:0;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--dim)">Sequence audit trail</h3>
+          <div class="audit" id="audit"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE VIEW -->
+  <div id="tableView">
+    <button class="btn printbtn" onclick="window.print()">🖨 Print / Save as PDF</button>
+    <div id="tableHost"></div>
+  </div>
+</div>
+
+<div class="foot" id="prov">Provenance note loads from the sequence file. Synthetic execution — no connection to any live DCS.</div>
+
+<script src="loup_sequence.js"></script>
+<script src="loup_autopilot.js"></script>
+</body>
+</html>

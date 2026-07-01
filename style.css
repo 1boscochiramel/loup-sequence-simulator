@@ -1,0 +1,46 @@
+/* DCS Copilot — shared styling. Browser-only, no build step.
+   Palette mirrors a real control-room HMI: dark slate, with green/amber/red urgency. */
+:root{
+  --bg:#0e1320; --panel:#161d2e; --panel2:#1d2740; --line:#2a3550;
+  --ink:#e8edf7; --mut:#9aa7c2; --dim:#6f7da0;
+  --ok:#2ecc71; --okd:#1e7e4f; --warn:#f4a72b; --warnd:#a8741a;
+  --crit:#ec4848; --critd:#a32a2a; --accent:#4aa3ff; --accentd:#1f5fa8;
+  --card:#1a2236;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.92em;color:#bcd4ff}
+
+/* ---- top bar ---- */
+.topbar{background:linear-gradient(180deg,#121a2c,#0e1320);border-bottom:1px solid var(--line);
+  padding:10px 18px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:30}
+.brand{font-weight:800;font-size:15px;letter-spacing:.2px;display:flex;align-items:center;gap:9px}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.brand small{color:var(--dim);font-weight:600;font-size:11px;letter-spacing:.5px;text-transform:uppercase}
+.topbar .spacer{flex:1}
+.toplink{color:var(--mut);font-weight:700;font-size:13px;padding:6px 11px;border-radius:8px;border:1px solid transparent}
+.toplink:hover{background:var(--panel2);color:var(--ink)}
+.toplink.on{background:var(--accentd);color:#fff;border-color:var(--accent)}
+
+/* ---- generic ---- */
+.wrap{max-width:1200px;margin:0 auto;padding:18px}
+.eyebrow{color:var(--accent);font-weight:800;font-size:11px;letter-spacing:.7px;text-transform:uppercase}
+.pill{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.4px;padding:3px 9px;border-radius:999px;text-transform:uppercase}
+.pill.ext{background:#15263f;color:#7fb6ff;border:1px solid #27568f}
+.pill.calc{background:#1c2a1d;color:#7fe0a0;border:1px solid #2f6a3f}
+.pill.synth{background:#2a2233;color:#d6a8f0;border:1px solid #6a4080}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.muted{color:var(--mut)}
+.dim{color:var(--dim)}
+.btn{background:var(--accentd);color:#fff;border:1px solid var(--accent);border-radius:10px;
+  padding:11px 16px;font-weight:800;cursor:pointer;font-size:14px}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost{background:transparent;color:var(--mut);border-color:var(--line)}
+.btn.ghost:hover{color:var(--ink);border-color:var(--accent)}
+
+/* footer */
+.foot{max-width:1200px;margin:24px auto 40px;padding:0 18px;color:var(--dim);font-size:12px}
+.foot h4{color:var(--mut);margin:0 0 6px}
