@@ -1,39 +1,66 @@
-# LOUP Sequence Autopilot — ISA-106 procedural automation
+# LOUP Sequence Autopilot — AI-Assisted Procedural Automation
 
-A browser-only, GitHub-Pages-ready app that runs the **LOUP** (Lube Oil Up-gradation Unit)
-DCS **start-up** and **emergency (ESD)** auto-sequences *live*: press Start and it validates
-interlocks, ramps pressures/temperatures, runs hold timers, takes conditional HOLD branches,
-and pauses for operator sign-off at key gates — every action logged.
+**Live app → https://1boscochiramel.github.io/loup-sequence-simulator/**
 
-No backend, no keys. All execution is on a **synthetic twin** of the sequence.
+An AI-assisted **procedural-automation co-pilot** (ISA-106 / Modular Procedural Automation) that runs a
+process unit's DCS **start-up auto-sequence** and its **emergency SOPs** step-by-step — validating interlocks,
+ramping pressures/temperatures, running hold tests, taking conditional **HOLD / ESD** branches, and pausing for
+the operator to **sign off** on key actions. Every action is logged to an audit trail.
+
+Built for the **HPCL hackathon**. Runs entirely in the browser — no backend, no keys.
+
+> 🔒 **Confidentiality:** every operating value (pressures, temperatures, flows, setpoints, trip thresholds) is
+> **randomised and illustrative — NOT actual plant data**. Execution runs on a **synthetic twin** with no
+> connection to any live DCS.
+
+---
+
+## What it does
+
+- **▶ Start-up** — the full 5-controller DCS start-up auto-sequence (HP-circuit pressurization → reactor heating →
+  feed/stripper readiness → feed cut-in & stabilization → wash-water system) with ramps, 30-min hold tests, and
+  conditional HOLD logic.
+- **🚨 Emergency** — a picker of **9 emergency procedures**: hydrogen failure, recycle-gas-compressor failure,
+  instrument-air failure, offsite feed-pump failure, loss of onsite liquid charge, dewaxed-oil-pump failure,
+  amine-pump failure, sea-cooling-water failure, and reactor-temperature-runaway restart.
+- **Live run** view (the sequence executes itself with field/DCS sign-off gates) and a printable **Sequence table** view.
+
+## Autonomy level
+
+Demonstrates **Yokogawa IA2IA Level 3 (semi-autonomous)**: the system executes pre-programmed steps; a human
+signs off on key actions. Shown on a digital twin as the safe, deployable first step up the maturity curve —
+*not* a claim that a real plant is autonomous.
+
+## Platform mapping (recommended hackathon stack)
+
+| Platform | Role |
+|----------|------|
+| 🧠 **Fluid AI** | Generate / explain / adapt the procedure; answer operator questions in natural language |
+| 📊 **Microsoft Power Apps** | The operator cockpit (this UI, low-code) |
+| 🤖 **UiPath** | Pull SOPs from legacy systems; log actions; send notifications |
+
+## Why it matters
+
+Start-ups, shutdowns and emergencies are where a plant carries the most **risk, cost and expert-dependence**.
+Guided auto-sequencing → **faster, safer, error-free** transitions, **captured expert knowledge**, and a full
+**auditable** action log for post-incident review.
+
+---
+
+## Run locally
+```bash
+python -m http.server 8081     # then open http://localhost:8081
+```
 
 ## Files
 | File | Role |
 |------|------|
-| `index.html` | The app (UI). |
-| `loup_autopilot.js` | The procedural-automation engine (step runner: check / field / signoff / ramp / hold / branch). |
-| `loup_sequence.js` | The sequence data — **STARTUP** (transcribed from the plant DCS auto-sequence sheet, 117 steps, 5 controllers) and **EMERGENCY** (ESD, derived). |
-| `style.css` | Styling. |
-
-## Two sequences
-- **Start-up** — HP-circuit pressurization & hold test → reactor heating (F-1101) → feed & stripper readiness → feed cut-in & stabilization → wash-water system. Real tags, ramp rates, 30-min hold tests, conditional HOLD logic — as written on the sheet.
-- **Emergency (ESD)** — ESD initiation & feed trip → fired-heater trip → emergency depressurization (blowdown to flare) → reactor quench & cool-down → compressor trip & safe isolation.
-
-Each has a **Live run** view (the running SFC) and a printable **Sequence table** view (scan-style; use 🖨 Print / Save as PDF).
-
-## Provenance / honesty
-- **Start-up** steps are transcribed from the plant's DCS auto-sequence sheet.
-- **Emergency (ESD)** is **DERIVED** from standard hydroprocessing emergency-depressurization practice + the unit tags — it is **not** an official plant ESD sheet. Supply the real emergency auto-sequence sheet and it can be transcribed faithfully like the start-up.
-- All execution is synthetic; there is **no connection to any live DCS**.
-
-## Run
-Static — open `index.html`, or serve the folder:
-```bash
-python -m http.server 8081
-# http://localhost:8081
-```
+| `index.html` | The app UI |
+| `loup_autopilot.js` | Procedural-automation engine (check / field / signoff / ramp / hold / branch) |
+| `loup_sequence.js` | Sequence data — start-up + 9 emergency scenarios (values randomised) |
+| `style.css` | Styling |
 
 ## Deploy (live URL)
-Static site, no build. Enable **Settings → Pages → Source: Deploy from a branch → `main` / root**.
-Note: GitHub Pages on a **private** repo needs a paid plan (Pro/Team); on a **public** repo it is free.
-Alternatively deploy from this repo to Netlify / Vercel / Cloudflare Pages for a free public URL.
+Static site, no build. **Settings → Pages → Deploy from a branch → `main` / root**. A `.nojekyll` file is
+included so GitHub Pages serves the static assets directly (no Jekyll). Public-repo Pages is free; private-repo
+Pages needs a paid plan.

@@ -107,6 +107,24 @@ table.seq td.rm{width:120px}
   <span class="pill synth">Synthetic twin of the real procedures</span>
   <div id="scenNote" style="margin-top:8px;color:#ffd9a8"></div></div>
 
+  <details class="note" style="border-color:#2f6a3f;background:#12251a;color:#cfeeda">
+    <summary style="cursor:pointer;font-weight:800;color:#8fe0a8">ℹ️ About this project — 30-second guide for reviewers</summary>
+    <div style="margin-top:10px;line-height:1.55">
+      <p style="margin:0 0 8px"><b>What it is.</b> An AI-assisted <b>procedural-automation co-pilot</b> (ISA-106 / MPA) that runs a process unit's
+      DCS <b>start-up auto-sequence</b> and its <b>emergency SOPs</b> step-by-step — validating interlocks, ramping pressures/temperatures,
+      running hold tests, taking conditional HOLD / ESD branches, and pausing for the operator to <b>sign off</b> on key actions. Every action is logged.</p>
+      <p style="margin:0 0 8px"><b>Autonomy.</b> Demonstrates <b>Yokogawa IA2IA Level 3 (semi-autonomous)</b> — the system executes pre-programmed
+      steps; a human signs off on key actions. Shown on a <b>digital twin</b> as the safe, deployable first step up the maturity curve.</p>
+      <p style="margin:0 0 8px"><b>Platform mapping.</b> 🧠 <b>Fluid AI</b> — generate / explain / adapt the procedure &amp; answer operator questions ·
+      📊 <b>Power Apps</b> — this operator cockpit · 🤖 <b>UiPath</b> — pull SOPs / log actions / notify.</p>
+      <p style="margin:0 0 8px"><b>Why it matters.</b> Start-ups, shutdowns and emergencies are where plants carry the most <b>risk, cost and
+      expert-dependence</b>. Guided auto-sequencing → <b>faster, safer, error-free</b> transitions and <b>captured expert knowledge</b>, with a full audit trail.</p>
+      <p style="margin:0"><b>How to demo.</b> Pick <b>▶ Start-up</b> or <b>🚨 Emergency</b> (choose a scenario) → press <b>Start Sequence</b> →
+      acknowledge the field/DCS gates → watch it run to completion. Use <b>Sequence table</b> for a printable view.
+      <span class="dim">All values randomised; no real plant data.</span></p>
+    </div>
+  </details>
+
   <div class="ctrlbar">
     <div class="seg" id="modeSeg">
       <button data-m="startup" class="on">▶ Start-up</button>
